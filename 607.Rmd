@@ -1,0 +1,65 @@
+---
+title: "Biostat 607"
+author: "Danting Yang"
+date: "10/14/2020"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+
+```{r}
+FConvertTOC <- function(temp) {
+ctemp <- (temp - 32) * 5/9
+return(ctemp)}
+
+CConvertTOF <- function(temp) {
+ftemp <- temp * 9/5 + 32
+return(ftemp)}
+
+ConvertTemp <- function(temp, FtoC = TRUE, print.mean = FALSE){
+if(FtoC&!print.mean){
+converted <- FConvertTOC(temp)
+}else if(!FtoC&!print.mean) {
+converted <- CConvertTOF(temp)
+}else if(FtoC&print.mean){
+converted <- FConvertTOC(temp) 
+print(mean(converted))
+}else if(!FtoC&print.mean){
+converted<- CConvertTOF(temp) 
+print(mean(converted))}
+return(converted)
+}
+```
+
+
+
+
+
+```{r}
+ConvertTemp(c(32, 50, 75, 100, 212))
+```
+
+```{r}
+ConvertTemp(c(0, 10, 20, 30, 100), FtoC = FALSE)
+```
+
+```{r}
+ConvertTemp(c(0, 10, 20, 30, 100), FtoC = FALSE, print.mean = TRUE)
+```
+
+```{r}
+ConvertTemp(seq(0, 100, by=10))
+ConvertTemp(seq(0, 100, by=10), FtoC = FALSE)
+ConvertTemp(c(27, 52.5, 68.9, 78.1, 91.7))
+ConvertTemp(c(27, 52.5, 68.9, 78.1, 91.7), print.mean=TRUE)
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
