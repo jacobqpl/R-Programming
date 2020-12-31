@@ -1,0 +1,84 @@
+---
+title: "Biostat 607 Final Assignment"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+setwd("D:/Courses")
+flights13 = read.csv("D:/Courses/flights13.CSV") 
+```
+
+1. First, remove every row from flights13 that has at least one missing value in that row. How many observations are left after removing these rows?
+There are 48594 rows left. 
+```{r}
+library(tidyverse)
+flight13_new = flights13 %>% drop_na()
+flight13_new
+```
+2. Create a new variable called dep_delay_cat which will represent the "severity" of the departure delay. This variable should be defined as:
+```{r}
+flight13_new = flight13_new %>% 
+  mutate(dep_delay_cat = 
+     case_when( dep_delay <= 10  ~ "no delay",
+              dep_delay > 10 & dep_delay <=  30~"moderate delay",
+              dep_delay > 30 & dep_delay <= 120 ~ "substantial delay",
+              dep_delay > 120 ~ "long delay"))
+head(flight13_new[,c("dep_delay", "dep_delay_cat")])
+```
+3. Create a 3 x 4 contingency table using the variables origin and dep_delay_cat. Here, for example, the [2,3] element of this table will be the number of flights that originated from JFK which had "no delay". Which of the three origin airports had the highest proportion of flights with a substantial delay?
+EWK had the highest proportion of flights with a substantial delay.
+```{r}
+library(gmodels)
+CrossTable(flight13_new$origin, flight13_new$dep_delay_cat)
+```
+4. For each of the 36 month and origin airport combinations, compute the mean departure delay time using the dep_delay variable. Which 5 month-airport combinations had the largest mean departure delay times? 
+```{r}
+flight13_new %>% group_by(month,origin) %>% summarise(meantime = mean(dep_delay)) %>% arrange(desc(meantime)) %>% head(5)
+```
+5. Compute the total number of flights for each of the 36 origin airport-month combinations. Which 5 month-airport combinations had the largest number of flights?
+```{r}
+flight13_new %>% group_by(month,origin) %>% summarise(flightnum = sum(flight)) %>% arrange(desc(flightnum)) %>% head(5)
+```
+6. Only using observations where departure delay times are both greater than 10 minutes and less than 180 minutes, plot 4 separate histograms of departure delay times for each quarter. Here, the first quarter is months 1-3, the second quarter is months 4-6, the third quarter is months 7-9, and the fourth quarter is months 10-12.
+```{r}
+flight13_new = flight13_new %>% 
+  mutate(monthcat = 
+     case_when( month <= 3  ~ "1",
+              month > 3 & month <=  6~"2",
+              month > 6 & month <= 9 ~ "3",
+              month > 9 & month <= 12 ~ "4"))
+flight13_new2 = flight13_new %>% filter(10 < dep_time & dep_time < 180)
+quarter1 = flight13_new2 %>% filter(monthcat=="1")
+quarter1hist = quarter1$dep_time
+hist(quarter1hist,breaks = 10)
+axis(side=1, at=seq(10,180,10))
+quarter2 = flight13_new2 %>% filter(monthcat=="2")
+quarter2hist = quarter2$dep_time
+hist(quarter2hist,breaks = 20)
+axis(side=1, at=seq(10,180,10))
+quarter3 = flight13_new2 %>% filter(monthcat=="3")
+quarter3hist = quarter3$dep_time
+hist(quarter3hist,breaks = 10)
+axis(side=1, at=seq(10,180,10))
+quarter4 = flight13_new2 %>% filter(monthcat=="4")
+quarter4hist = quarter4$dep_time
+hist(quarter4hist)
+```
+7. Again, only using observations where departure delay times are between 10 and 180 minutes, make 12 boxplots of the log of departure delay times for each month. These 12 boxplots should be on a single graph. Use the log function to take the log of the departure delay times.
+```{r}
+flight13_new2
+flight13_new2$logdep_time = flight13_new2$dep_time %>% log()
+boxplot(logdep_time~month,
+data=flight13_new2,
+main="Different boxplots for each month",
+xlab="Month Number",
+ylab="Departure Delay Times",
+col="light blue",
+border="brown"
+)
+```
+

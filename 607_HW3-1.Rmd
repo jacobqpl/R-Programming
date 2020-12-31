@@ -1,0 +1,86 @@
+---
+title: "Biostat 607 Homework3"
+output: html_notebook
+---
+
+
+```{r}
+library(faraway)
+data(nepali)
+library(tidyverse)
+library(dplyr) 
+```
+
+```{r}
+nepali
+```
+
+(a) How many unique children (i.e., unique values of the id variable) are there in this
+dataset? Create a new variable called num.id (a vector of length one) which is
+equal to the number of unique ID's in this dataset.
+There are 200 unique children in this dataset.
+```{r}
+id.freq = nepali$id %>% table() 
+id.freq1 = as.data.frame(id.freq)
+id.freq1
+nepali$num.id = id.freq1$Freq
+nepali
+```
+(b) Convert the id variable in nepali to a character variable.
+```{r}
+nepali$id = as.character(nepali$id) 
+nepali$id %>% is.character()
+```
+(c) The first two digits of the id number represent the panchayat number. Add a
+new variable called panchayat to the nepali data frame which is equal to the
+first two digits of the id variable. The function substr will probably be useful
+for this step.
+```{r}
+nepali$panchayat = substr(nepali$id,1,2)
+nepali$panchayat
+```
+(d) How many unique panchayats are in this dataset?
+There are three unique panchayats in this dataset.
+```{r}
+nepali$panchayat %>% unique() %>% table()
+```
+(e) The first five digits of the id represent the household identifier. Add a new called
+house_id to the nepali data frame which is equal to the first five digits of the
+id variable. The function substr will also be useful for this step.
+```{r}
+nepali$house_id = substr(nepali$id,1,5)
+nepali$house_id
+```
+(f) Some of the observations on children are missing a weight (wt) value. How many
+observations have a missing weight value?
+There are 123 missing values for weight.
+```{r}
+nepali$wt %>% is.na() %>% table()
+```
+(g) Add a new variable to nepali called visit using the following code:
+```{r}
+nepali$visit <- rep(1:5, num.id)
+```
+
+
+```{r}
+nepali$visit <- rep(1:5)
+head(nepali, 10)
+```
+(h) Create a new data frame called nepali1 which only contains the observations
+that have visit == 1.
+```{r}
+nepali1 = nepali %>% filter(visit==1)
+nepali1
+```
+(i) Using nepali1, compute the mean child age (the age variable) in each panchayat.
+```{r}
+nepali1 %>%  group_by(panchayat) %>% summarise(mean.age = mean(age))
+```
+(j) Also, using nepali1, compute the correlation (using the R function cor) between
+mother's age (mage) and age of child (age) in each panchayat.
+```{r}
+nepali1 %>% group_by(panchayat) %>% summarize(COR=cor(mage,age))
+```
+
+
